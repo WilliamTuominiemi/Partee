@@ -17,21 +17,21 @@ const ThreeScene: React.FC = () => {
 
       // Golf track
       const mapGeometry = new THREE.BoxGeometry(10, 1, 40);
-      const mapMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const mapMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
       const cube = new THREE.Mesh(mapGeometry, mapMaterial);
       scene.add(cube);
 
       // Golf ball
       const sphereGeometry = new THREE.SphereGeometry();
-      const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+      const sphereMaterial = new THREE.MeshLambertMaterial({ color: 0xffff00 });
       const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
       sphere.position.y = 1.5;
       sphere.position.z = 18;
       scene.add(sphere);
 
       // Lighting
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-      scene.add(directionalLight);
+      const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
+      scene.add(light);
 
       // Render scene
       renderer.render(scene, camera);

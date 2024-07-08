@@ -10,11 +10,26 @@ const ThreeScene: React.FC = () => {
     new THREE.Vector2(-5, -20),
     new THREE.Vector2(5, -20),
     new THREE.Vector2(5, 20),
-    new THREE.Vector2(20, 20),
-    new THREE.Vector2(20, 30),
+    new THREE.Vector2(40, 20),
+    new THREE.Vector2(40, 30),
     new THREE.Vector2(-5, 30),
     new THREE.Vector2(-5, -20),
   ];
+
+  const initialBallPosition = new THREE.Vector3(0, 1, 18); // Initial position of the ball
+
+  // Check if ball is within the area of the platform
+  const isBallWithinPlatform = (sphere: THREE.Mesh, platform: THREE.Mesh): boolean => {
+    const spherePosition = sphere.position.clone();
+
+    // Raycast downward from ball position
+    const raycaster = new THREE.Raycaster(spherePosition.clone(), new THREE.Vector3(0, -1, 0));
+
+    // Check if the raycast intersects the platform
+    const intersections = raycaster.intersectObject(platform);
+
+    return intersections.length > 0;
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -25,7 +40,7 @@ const ThreeScene: React.FC = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       containerRef.current?.appendChild(renderer.domElement);
 
-      // Golf track
+      // Golf course platform
       const mapGeometry = new THREE.ShapeGeometry(new THREE.Shape(polygonVertices));
       const mapMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
       const platform = new THREE.Mesh(mapGeometry, mapMaterial);
@@ -36,8 +51,7 @@ const ThreeScene: React.FC = () => {
       const sphereGeometry = new THREE.SphereGeometry();
       const sphereMaterial = new THREE.MeshLambertMaterial({ color: 0xffff00 });
       const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-      sphere.position.y = 1.5;
-      sphere.position.z = 18;
+      sphere.position.copy(initialBallPosition);
       scene.add(sphere);
 
       // Lighting
@@ -58,7 +72,15 @@ const ThreeScene: React.FC = () => {
           sphere.position.z -= ballSpeed * Math.cos(sphereDirection) * deltaTime * 60;
           sphere.position.x -= ballSpeed * Math.sin(sphereDirection) * deltaTime * 60;
           ballSpeed *= 0.99; // Slow ball
-          if (ballSpeed < 0.01) ballSpeed = 0; // Stop the ball
+          if (ballSpeed < 0.01) {
+            // When ball is stopping, check if it is within platform bounds
+            if (isBallWithinPlatform(sphere, platform)) {
+              ballSpeed = 0; // stop the ball
+            } else {
+              // Reset ball position to initial position
+              sphere.position.copy(initialBallPosition);
+            }
+          }
         }
 
         // Update camera position and rotation

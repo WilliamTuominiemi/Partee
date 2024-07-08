@@ -1,5 +1,11 @@
-import Image from 'next/image';
+'use client';
+
+import Scene from '@/components/ThreeScene';
 
 export default function Home() {
-  return <main></main>;
+  return (
+    <main>
+      <Scene />
+    </main>
+  );
 }

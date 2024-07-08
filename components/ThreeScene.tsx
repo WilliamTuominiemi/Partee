@@ -6,6 +6,16 @@ const ThreeScene: React.FC = () => {
   let sphereDirection = 0; // Direction in radians
   let ballSpeed = 0; // Ball speed
 
+  const polygonVertices = [
+    new THREE.Vector2(-5, -20),
+    new THREE.Vector2(5, -20),
+    new THREE.Vector2(5, 20),
+    new THREE.Vector2(20, 20),
+    new THREE.Vector2(20, 30),
+    new THREE.Vector2(-5, 30),
+    new THREE.Vector2(-5, -20),
+  ];
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       // Scene setup
@@ -16,10 +26,11 @@ const ThreeScene: React.FC = () => {
       containerRef.current?.appendChild(renderer.domElement);
 
       // Golf track
-      const mapGeometry = new THREE.BoxGeometry(10, 1, 40);
-      const mapMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
-      const cube = new THREE.Mesh(mapGeometry, mapMaterial);
-      scene.add(cube);
+      const mapGeometry = new THREE.ShapeGeometry(new THREE.Shape(polygonVertices));
+      const mapMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const platform = new THREE.Mesh(mapGeometry, mapMaterial);
+      platform.rotation.x = -Math.PI / 2;
+      scene.add(platform);
 
       // Golf ball
       const sphereGeometry = new THREE.SphereGeometry();

@@ -10,18 +10,33 @@ const ThreeScene: React.FC = () => {
       const renderer = new THREE.WebGLRenderer();
       renderer.setSize(window.innerWidth, window.innerHeight);
       containerRef.current?.appendChild(renderer.domElement);
-      camera.position.z = 5;
+      camera.position.z = 40;
+      camera.position.y = 10;
 
-      const geometry = new THREE.BoxGeometry();
-      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-      const cube = new THREE.Mesh(geometry, material);
+      const map_geometry = new THREE.BoxGeometry(10, 1, 40);
+      const map_material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const cube = new THREE.Mesh(map_geometry, map_material);
       scene.add(cube);
+
+      const geometry = new THREE.SphereGeometry();
+      const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+      const sphere = new THREE.Mesh(geometry, material);
+      sphere.position.y = 1.5;
+      sphere.position.z = 18;
+
+      scene.add(sphere);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+      scene.add(directionalLight);
 
       renderer.render(scene, camera);
 
       const renderScene = () => {
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
+        if (sphere.position.z > -18) {
+          sphere.position.z -= 0.05;
+        } else {
+          sphere.position.z = 18;
+        }
         renderer.render(scene, camera);
         requestAnimationFrame(renderScene);
       };

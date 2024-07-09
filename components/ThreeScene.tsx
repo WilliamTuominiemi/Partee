@@ -42,20 +42,26 @@ const ThreeScene: React.FC = () => {
 
       // Golf course platform
       const mapGeometry = new THREE.ShapeGeometry(new THREE.Shape(polygonVertices));
-      const mapMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const mapMaterial = new THREE.MeshLambertMaterial({ color: 0x00a300 });
       const platform = new THREE.Mesh(mapGeometry, mapMaterial);
       platform.rotation.x = -Math.PI / 2;
       scene.add(platform);
 
       // Golf ball
       const sphereGeometry = new THREE.SphereGeometry();
-      const sphereMaterial = new THREE.MeshLambertMaterial({ color: 0xffff00 });
+      const sphereMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
       const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
       sphere.position.copy(initialBallPosition);
       scene.add(sphere);
 
+      // Set camera position
+      camera.position.x = sphere.position.x + 20 * Math.sin(sphereDirection);
+      camera.position.y = sphere.position.y + 10;
+      camera.position.z = sphere.position.z + 20 * Math.cos(sphereDirection);
+      camera.lookAt(sphere.position);
+
       // Lighting
-      const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
+      const light = new THREE.HemisphereLight(0xffffff, 0x00a300, 1.5);
       scene.add(light);
 
       // Render scene

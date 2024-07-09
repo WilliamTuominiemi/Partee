@@ -3,39 +3,44 @@ import * as THREE from 'three';
 
 const ThreeScene: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  let sphereDirection = 0; // Direction in radians
-  let ballSpeed = 0; // Ball speed
-
-  const polygonVertices = [
-    new THREE.Vector2(-5, -20),
-    new THREE.Vector2(5, -20),
-    new THREE.Vector2(5, 20),
-    new THREE.Vector2(40, 20),
-    new THREE.Vector2(40, 30),
-    new THREE.Vector2(-5, 30),
-    new THREE.Vector2(-5, -20),
-  ];
-
-  const initialBallPosition = new THREE.Vector3(0, 1, 18); // Initial position of the ball
-
-  // Check if ball is within the area of the platform
-  const isBallWithinPlatform = (sphere: THREE.Mesh, platform: THREE.Mesh): boolean => {
-    const spherePosition = sphere.position.clone();
-
-    // Raycast downward from ball position
-    const raycaster = new THREE.Raycaster(spherePosition.clone(), new THREE.Vector3(0, -1, 0));
-
-    // Check if the raycast intersects the platform
-    const intersections = raycaster.intersectObject(platform);
-
-    return intersections.length > 0;
-  };
 
   useEffect(() => {
+    let sphereDirection = 0; // Direction in radians
+    let ballSpeed = 0; // Ball speed
+
+    const polygonVertices = [
+      new THREE.Vector2(0, 0),
+      new THREE.Vector2(10, 0),
+      new THREE.Vector2(10, 40),
+      new THREE.Vector2(40, 40),
+      new THREE.Vector2(40, 50),
+      new THREE.Vector2(0, 50),
+      new THREE.Vector2(0, 0),
+    ];
+
+    const holePosition = new THREE.Vector3(35, 1.5, -45);
+
+    const initialBallPosition = new THREE.Vector3(5, 1, -5); // Initial position of the ball
+
+    // Check if ball is within the area of the platform
+    const isBallWithinPlatform = (sphere: THREE.Mesh, platform: THREE.Mesh): boolean => {
+      const spherePosition = sphere.position.clone();
+
+      // Raycast downward from ball position
+      const raycaster = new THREE.Raycaster(spherePosition.clone(), new THREE.Vector3(0, -1, 0));
+
+      // Check if the raycast intersects the platform
+      const intersections = raycaster.intersectObject(platform);
+
+      return intersections.length > 0;
+    };
+
+    console.log('Initializing Three.js');
+
     if (typeof window !== 'undefined') {
       // Scene setup
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       containerRef.current?.appendChild(renderer.domElement);
@@ -54,11 +59,12 @@ const ThreeScene: React.FC = () => {
       sphere.position.copy(initialBallPosition);
       scene.add(sphere);
 
-      // Set camera position
-      camera.position.x = sphere.position.x + 20 * Math.sin(sphereDirection);
-      camera.position.y = sphere.position.y + 10;
-      camera.position.z = sphere.position.z + 20 * Math.cos(sphereDirection);
-      camera.lookAt(sphere.position);
+      // "Hole"
+      const icosahedronGeometry = new THREE.IcosahedronGeometry();
+      const icosahedronmaterial = new THREE.MeshLambertMaterial({ color: 0xa020f0 });
+      const hole = new THREE.Mesh(icosahedronGeometry, icosahedronmaterial);
+      hole.position.copy(holePosition);
+      scene.add(hole);
 
       // Lighting
       const light = new THREE.HemisphereLight(0xffffff, 0x00a300, 1.5);
@@ -91,7 +97,7 @@ const ThreeScene: React.FC = () => {
 
         // Update camera position and rotation
         camera.position.x = sphere.position.x + 20 * Math.sin(sphereDirection);
-        camera.position.y = sphere.position.y + 10;
+        camera.position.y = sphere.position.y + 5;
         camera.position.z = sphere.position.z + 20 * Math.cos(sphereDirection);
         camera.lookAt(sphere.position);
 

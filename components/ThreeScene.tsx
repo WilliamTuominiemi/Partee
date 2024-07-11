@@ -80,6 +80,14 @@ const ThreeScene: React.FC = () => {
             // When ball is stopping, check if it is within platform bounds
             if (isBallWithinPlatform(sphere, platform)) {
               ballSpeed = 0; // stop the ball
+
+              // Check if ball stops near the "hole". If this is the case, they player won the level
+              if (
+                Math.abs(Math.abs(holePosition.x) - Math.abs(sphere.position.x)) < 3 &&
+                Math.abs(Math.abs(holePosition.z) - Math.abs(sphere.position.z)) < 3
+              ) {
+                console.log('win');
+              }
             } else {
               // Reset ball position to initial position
               sphere.position.copy(initialBallPosition);

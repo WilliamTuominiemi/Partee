@@ -10,9 +10,11 @@ const ThreeScene: React.FC = () => {
       let sphereDirection = 0; // Direction in radians
       let ballSpeed = 0; // Ball speed
 
-      const polygonVertices = getRandomLevel();
+      const level = getRandomLevel();
 
-      const holePosition = new THREE.Vector3(35, 1.5, -45);
+      const polygonVertices = level.map;
+
+      const holePosition = level.hole;
 
       const initialBallPosition = new THREE.Vector3(5, 1, -5); // Initial position of the ball
 

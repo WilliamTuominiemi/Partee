@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
+import { getRandomLevel } from '@/utils/Maps';
 
 const ThreeScene: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -8,15 +9,7 @@ const ThreeScene: React.FC = () => {
     let sphereDirection = 0; // Direction in radians
     let ballSpeed = 0; // Ball speed
 
-    const polygonVertices = [
-      new THREE.Vector2(0, 0),
-      new THREE.Vector2(10, 0),
-      new THREE.Vector2(10, 40),
-      new THREE.Vector2(40, 40),
-      new THREE.Vector2(40, 50),
-      new THREE.Vector2(0, 50),
-      new THREE.Vector2(0, 0),
-    ];
+    const polygonVertices = getRandomLevel();
 
     const holePosition = new THREE.Vector3(35, 1.5, -45);
 
@@ -34,8 +27,6 @@ const ThreeScene: React.FC = () => {
 
       return intersections.length > 0;
     };
-
-    console.log('Initializing Three.js');
 
     if (typeof window !== 'undefined') {
       // Scene setup

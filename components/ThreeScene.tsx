@@ -6,29 +6,28 @@ const ThreeScene: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let sphereDirection = 0; // Direction in radians
-    let ballSpeed = 0; // Ball speed
+    if (containerRef.current && typeof window !== 'undefined') {
+      let sphereDirection = 0; // Direction in radians
+      let ballSpeed = 0; // Ball speed
 
-    const polygonVertices = getRandomLevel();
+      const polygonVertices = getRandomLevel();
 
-    const holePosition = new THREE.Vector3(35, 1.5, -45);
+      const holePosition = new THREE.Vector3(35, 1.5, -45);
 
-    const initialBallPosition = new THREE.Vector3(5, 1, -5); // Initial position of the ball
+      const initialBallPosition = new THREE.Vector3(5, 1, -5); // Initial position of the ball
 
-    // Check if ball is within the area of the platform
-    const isBallWithinPlatform = (sphere: THREE.Mesh, platform: THREE.Mesh): boolean => {
-      const spherePosition = sphere.position.clone();
+      // Check if ball is within the area of the platform
+      const isBallWithinPlatform = (sphere: THREE.Mesh, platform: THREE.Mesh): boolean => {
+        const spherePosition = sphere.position.clone();
 
-      // Raycast downward from ball position
-      const raycaster = new THREE.Raycaster(spherePosition.clone(), new THREE.Vector3(0, -1, 0));
+        // Raycast downward from ball position
+        const raycaster = new THREE.Raycaster(spherePosition.clone(), new THREE.Vector3(0, -1, 0));
 
-      // Check if the raycast intersects the platform
-      const intersections = raycaster.intersectObject(platform);
+        // Check if the raycast intersects the platform
+        const intersections = raycaster.intersectObject(platform);
 
-      return intersections.length > 0;
-    };
-
-    if (typeof window !== 'undefined') {
+        return intersections.length > 0;
+      };
       // Scene setup
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);

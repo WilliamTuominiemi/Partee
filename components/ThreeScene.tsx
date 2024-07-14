@@ -7,16 +7,31 @@ const ThreeScene: React.FC = () => {
 
   useEffect(() => {
     if (containerRef.current && typeof window !== 'undefined') {
-      let sphereDirection = 0; // Direction in radians
-      let ballSpeed = 0; // Ball speed
-
       const level = getRandomLevel();
 
-      const polygonVertices = level.map;
+      const initializePlatform = () => {
+        const polygonVertices = level.map;
 
-      const holePosition = level.hole;
+        const mapGeometry = new THREE.ShapeGeometry(new THREE.Shape(polygonVertices));
+        const mapMaterial = new THREE.MeshLambertMaterial({ color: 0x00a300 });
+        const platform = new THREE.Mesh(mapGeometry, mapMaterial);
 
-      const initialBallPosition = new THREE.Vector3(5, 1, -5); // Initial position of the ball
+        return platform;
+      };
+
+      const initializeBall = () => {
+        const sphereGeometry = new THREE.SphereGeometry();
+        const sphereMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        return sphere;
+      };
+
+      const initializeHole = () => {
+        const icosahedronGeometry = new THREE.IcosahedronGeometry();
+        const icosahedronmaterial = new THREE.MeshLambertMaterial({ color: 0xa020f0 });
+        const hole = new THREE.Mesh(icosahedronGeometry, icosahedronmaterial);
+        return hole;
+      };
 
       // Check if ball is within the area of the platform
       const isBallWithinPlatform = (sphere: THREE.Mesh, platform: THREE.Mesh): boolean => {
@@ -30,6 +45,12 @@ const ThreeScene: React.FC = () => {
 
         return intersections.length > 0;
       };
+
+      let sphereDirection = 0; // Direction in radians
+      let ballSpeed = 0; // Ball speed
+
+      const initialBallPosition = new THREE.Vector3(5, 1, -5); // Initial position of the ball
+
       // Scene setup
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
@@ -38,23 +59,18 @@ const ThreeScene: React.FC = () => {
       containerRef.current?.appendChild(renderer.domElement);
 
       // Golf course platform
-      const mapGeometry = new THREE.ShapeGeometry(new THREE.Shape(polygonVertices));
-      const mapMaterial = new THREE.MeshLambertMaterial({ color: 0x00a300 });
-      const platform = new THREE.Mesh(mapGeometry, mapMaterial);
+      const platform = initializePlatform();
       platform.rotation.x = -Math.PI / 2;
       scene.add(platform);
 
       // Golf ball
-      const sphereGeometry = new THREE.SphereGeometry();
-      const sphereMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
-      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      const sphere = initializeBall();
       sphere.position.copy(initialBallPosition);
       scene.add(sphere);
 
       // "Hole"
-      const icosahedronGeometry = new THREE.IcosahedronGeometry();
-      const icosahedronmaterial = new THREE.MeshLambertMaterial({ color: 0xa020f0 });
-      const hole = new THREE.Mesh(icosahedronGeometry, icosahedronmaterial);
+      const hole = initializeHole();
+      const holePosition = level.hole;
       hole.position.copy(holePosition);
       scene.add(hole);
 

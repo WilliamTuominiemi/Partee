@@ -41,8 +41,17 @@ const level3hole = new THREE.Vector3(15, 1.5, -115);
 const levels = [level1, level2, level3];
 const holes = [level1hole, level2hole, level3hole];
 
-export function getRandomLevel() {
-  const randomIndex = Math.floor(Math.random() * levels.length);
-  console.log(randomIndex);
-  return { map: levels[randomIndex], hole: holes[randomIndex] };
+export function getRandomLevel(lastId: number | null) {
+  let randomIndex;
+
+  // If lastId is null, don't check for uniqueness from last id
+  if (lastId === null) {
+    randomIndex = Math.floor(Math.random() * levels.length);
+  } else {
+    do {
+      randomIndex = Math.floor(Math.random() * levels.length);
+    } while (randomIndex === lastId);
+  }
+
+  return { map: levels[randomIndex], hole: holes[randomIndex], id: randomIndex };
 }

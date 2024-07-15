@@ -7,7 +7,8 @@ const ThreeScene: React.FC = () => {
 
   useEffect(() => {
     if (containerRef.current && typeof window !== 'undefined') {
-      const level = getRandomLevel();
+      let level = getRandomLevel(null);
+      let lastlevelId: number = level.id;
 
       const initializePlatform = () => {
         const polygonVertices = level.map;
@@ -59,7 +60,7 @@ const ThreeScene: React.FC = () => {
       containerRef.current?.appendChild(renderer.domElement);
 
       // Golf course platform
-      const platform = initializePlatform();
+      let platform = initializePlatform();
       platform.rotation.x = -Math.PI / 2;
       scene.add(platform);
 
@@ -83,6 +84,31 @@ const ThreeScene: React.FC = () => {
 
       let previousTime = performance.now();
 
+      // Reset game when ball reaches hole
+      const inHole = () => {
+        // Get new level config, current level id so that it doesn't come again
+        level = getRandomLevel(lastlevelId);
+
+        // Reset platform
+        const oldPlatform = scene.getObjectByProperty('uuid', platform.uuid);
+
+        if (oldPlatform) scene.remove(oldPlatform);
+
+        platform = initializePlatform();
+        platform.rotation.x = -Math.PI / 2;
+        scene.add(platform);
+
+        // Reset ball
+        sphere.position.copy(initialBallPosition);
+
+        // Reset hole
+        const holePosition = level.hole;
+        hole.position.copy(holePosition);
+
+        // Render scene
+        renderer.render(scene, camera);
+      };
+
       const renderScene = (currentTime: number) => {
         const deltaTime = (currentTime - previousTime) / 1000;
         previousTime = currentTime;
@@ -102,7 +128,7 @@ const ThreeScene: React.FC = () => {
                 Math.abs(Math.abs(holePosition.x) - Math.abs(sphere.position.x)) < 3 &&
                 Math.abs(Math.abs(holePosition.z) - Math.abs(sphere.position.z)) < 3
               ) {
-                console.log('win');
+                inHole();
               }
             } else {
               // Reset ball position to initial position

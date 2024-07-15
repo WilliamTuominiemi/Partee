@@ -9,6 +9,7 @@ const ThreeScene: React.FC = () => {
     if (containerRef.current && typeof window !== 'undefined') {
       let level = getRandomLevel(null);
       let lastlevelId: number = level.id;
+      let ballVelocity: number = 0.5;
 
       const initializePlatform = () => {
         const polygonVertices = level.map;
@@ -83,6 +84,24 @@ const ThreeScene: React.FC = () => {
       renderer.render(scene, camera);
 
       let previousTime = performance.now();
+
+      // Update ball color depending on the set velocity
+      const lightBlue = new THREE.Color(0xadd8e6);
+      const orange = new THREE.Color(0xffa500);
+
+      const updateBallColor = (ballVelocity: number) => {
+        const t = (ballVelocity - 0.1) / (1 - 0.1); // Normalize ballSpeed to a value between 0 and 1
+        sphere.material.color = lightBlue.clone().lerp(orange, t);
+      };
+
+      // Set the color at start
+      updateBallColor(ballVelocity);
+
+      // update velocity
+      const updateVelocity = (newVelocity: number) => {
+        ballVelocity = Math.min(Math.max(newVelocity, 0.1), 1);
+        updateBallColor(ballVelocity);
+      };
 
       // Reset game when ball reaches hole
       const inHole = () => {
@@ -164,16 +183,28 @@ const ThreeScene: React.FC = () => {
         if (ballSpeed === 0) {
           // Only allow rotation when the ball is stopped
           switch (event.key) {
+            // Controls to steer ball path
             case 'ArrowLeft':
             case 'a':
+            case 'A':
               sphereDirection += 0.1;
               break;
             case 'ArrowRight':
             case 'd':
+            case 'D':
               sphereDirection -= 0.1;
               break;
             case ' ':
-              if (ballSpeed === 0) ballSpeed = 1; // Hit the ball
+              if (ballSpeed === 0) ballSpeed = ballVelocity; // Hit the ball
+              break;
+            //Controls to change hit power
+            case 'w':
+            case 'W':
+              updateVelocity(ballVelocity + 0.1);
+              break;
+            case 's':
+            case 'S':
+              updateVelocity(ballVelocity - 0.1);
               break;
             default:
               break;
@@ -181,18 +212,12 @@ const ThreeScene: React.FC = () => {
         }
       };
 
-      const handleMouseClick = () => {
-        if (ballSpeed === 0) ballSpeed = 1; // Hit the ball
-      };
-
       window.addEventListener('resize', handleResize);
       window.addEventListener('keydown', handleKeyDown);
-      window.addEventListener('mousedown', handleMouseClick);
 
       return () => {
         window.removeEventListener('resize', handleResize);
         window.removeEventListener('keydown', handleKeyDown);
-        window.removeEventListener('mousedown', handleMouseClick);
       };
     }
   }, []);
